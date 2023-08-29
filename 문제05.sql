@@ -85,17 +85,14 @@ FROM
 	tblinsa;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+SELECT
+	min(
+		CASE
+			WHEN ssn LIKE '%-1%' THEN to_number(substr(ssn, 0, 2))
+		END) AS 남자,
+	max(
+		CASE
+			WHEN ssn LIKE '%-1%' THEN to_number(substr(ssn, 0, 2))
+		END) AS 여자
+FROM
+	tblinsa;
