@@ -38,6 +38,15 @@ SELECT
 FROM
 	tblinsa;
 
+SELECT
+	count(decode(jikwi, '부장', 1)) AS 부장,
+	count(decode(jikwi, '과장', 1)) AS 과장,
+	count(decode(jikwi, '대리', 1)) AS 대리,
+	count(decode(jikwi, '사원', 1)) AS 사원
+FROM
+	tblinsa;
+
+
 -- 5. tblInsa. 간부(부장, 과장) 몇명? 사원(대리, 사원) 몇명?
 SELECT
 	count(
@@ -50,6 +59,12 @@ SELECT
 			WHEN jikwi NOT LIKE '_장' THEN 1
 		END
 	) AS 사원
+FROM
+	tblinsa;
+
+SELECT
+	count(decode(jikwi, '부장', 1, '과장', 1)) AS 간부,
+	count(decode(jikwi, '대리', 1, '사원', 1)) AS 사원
 FROM
 	tblinsa;
 
@@ -73,7 +88,24 @@ SELECT
 FROM
 	tblinsa;
 
+SELECT
+	avg(decode(buseo, '기획부', basicpay)) AS 기획부, 
+	avg(decode(buseo, '영업부', basicpay)) AS 영업부, 
+	avg(decode(buseo, '총무부', basicpay)) AS 총무부, 
+	avg(decode(buseo, '개발부', basicpay)) AS 개발부
+FROM
+	tblinsa;
+
 -- 7. tblInsa. 남자 직원 가장 나이가 많은 사람이 몇년도 태생? 여자 직원 가장 나이가 어린 사람이 몇년도 태생?
+SELECT * FROM tblinsa;
+
+SELECT
+	min(to_number(decode(substr(ssn, 8, 1), 1, substr(ssn, 1, 2)))) AS 남자,
+	max(to_number(decode(substr(ssn, 8, 1), 2, substr(ssn, 1, 2)))) AS 여자
+FROM
+	tblinsa;
+
+
 SELECT
 	min(to_number(substr(CASE
 		WHEN ssn LIKE '%-1%' THEN ssn
@@ -96,3 +128,5 @@ SELECT
 		END) AS 여자
 FROM
 	tblinsa;
+
+
