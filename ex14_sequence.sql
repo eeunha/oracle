@@ -25,7 +25,7 @@ SELECT seqNum.nextVal FROM dual; -- 일련 번호 생성
 
 SELECT * FROM tblMemo;
 
-DELETE FROM tblMemo;
+DELETE table tblMemo;
 
 CREATE SEQUENCE seqMemo;
 

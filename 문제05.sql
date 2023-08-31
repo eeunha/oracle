@@ -9,6 +9,15 @@
 --    > 컬럼 리스트 > fullname(first_name + last_name), length(fullname)
 SELECT first_name || ' ' || last_name AS fullname FROM employees ORDER BY LENGTH(first_name) + LENGTH(last_name) desc;
 
+--답
+SELECT
+	first_name || ' ' || last_name AS fullname,
+	LENGTH(first_name || ' ' || last_name) AS namelength
+FROM
+	employees
+ORDER BY
+	namelength ASC;
+
 -- 2. 전체 이름(first_name + last_name)이 가장 긴 사람은 몇글자? 가장 짧은 사람은 몇글자? 평균 몇글자?
 --    > 컬럼 리스트 > 숫자 3개 컬럼
 SELECT max(length(first_name || last_name)), min(length(first_name || last_name)), avg(length(first_name || last_name)) FROM employees;
@@ -104,6 +113,12 @@ SELECT
 	max(to_number(decode(substr(ssn, 8, 1), 2, substr(ssn, 1, 2)))) AS 여자
 FROM
 	tblinsa;
+
+--답
+select
+    '19' || min(decode(substr(ssn, 8, 1), '1', substr(ssn, 1, 2))),
+    '19' || max(decode(substr(ssn, 8, 1), '2', substr(ssn, 1, 2)))
+from tblInsa;
 
 
 SELECT

@@ -15,10 +15,16 @@ SELECT
 FROM
 	tblcountry;
 
+--답
+select count(*) from tblCountry
+    where continent in ('AS', 'EU');
 
 -- 2. 인구수가 7000 ~ 20000 사이인 나라의 개수?? -> 2개
     SELECT count(name) FROM tblcountry WHERE population BETWEEN 7000 AND 20000;
 
+--답
+select count(*) from tblCountry
+    where population between 7000 and 20000;
 
 -- 3. hr.employees. job_id > 'IT_PROG' 중에서 급여가 5000불이 넘는 직원이 몇명? -> 2명
     SELECT count(*) FROM employees WHERE job_id = 'IT_PROG' AND salary > 5000;
@@ -36,21 +42,25 @@ SELECT count(*) FROM tblinsa WHERE city NOT IN ('서울', '경기', '인천');
 -- 6. 여름태생(7~9월) + 여자 직원 총 몇명? -> 7명
 SELECT count(*) FROM tblinsa WHERE substr(ssn, 3, 2) IN ('07', '08', '09') AND ssn LIKE '%-2%';
 
+--답
+select count(*) from tblInsa
+    where ssn like '__07%-2%' or ssn like '__08%-2%' or ssn like '__09%-2%';
+
 
 -- 7. 개발부 + 직위별 인원수? -> 부장 ?명, 과장 ?명, 대리 ?명, 사원 ?명
 SELECT
 	count(CASE
 		WHEN jikwi = '부장' THEN 1
-	END),
+	END) AS 부장,
 	count(CASE
 		WHEN jikwi = '과장' THEN 1
-	END),
+	END) AS 과장,
 	count(CASE
 		WHEN jikwi = '대리' THEN 1
-	END),
+	END) AS 대리,
 	count(CASE
 		WHEN jikwi = '사원' THEN 1
-	END)
+	END) AS 사원
 FROM
 	tblinsa
 WHERE

@@ -23,6 +23,11 @@ SELECT * FROM tblinsa;
 SELECT * FROM tblinsa WHERE ssn LIKE '%-1%' AND substr(ssn, 0, 2) BETWEEN 80 AND 89 ;
 SELECT DISTINCT jikwi FROM tblinsa WHERE ssn LIKE '%-1%' AND substr(ssn, 0, 2) BETWEEN 80 AND 89;
 
+-- 답
+select distinct jikwi from tblInsa
+    where ssn like '8%-1%';
+
+
 --요구사항.005.tblInsa
 --수당 20만원 넘는 직원들은 어디 삽니까? > sudang + city   
 SELECT DISTINCT city FROM tblinsa WHERE sudang >= 200000;
