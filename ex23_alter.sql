@@ -80,3 +80,37 @@ DROP COLUMN qty;
 
 ALTER TABLE tbledit
 DROP COLUMN seq; -- PRIMARY KEY 삭제 > 절대 금지!!!!!!!!!
+
+
+-- Case 3. 컬럼 수정하기
+SELECT * FROM tblEdit;
+
+INSERT INTO tblEdit VALUES (4, '애플 M2 맥북 프로 2023');
+
+-- Case 3.1 컬럼 길이 수정하기(확장/축소)
+ALTER TABLE tbledit
+MODIFY (DATA varchar2(100));
+
+ALTER TABLE tbledit
+MODIFY (DATA varchar2(20));
+
+
+-- Case 3.2 컬럼의 제약사항 수정하기
+ALTER TABLE tbledit
+MODIFY (DATA varchar2(100) null);
+
+INSERT INTO tbledit VALUES (5, null);
+
+ALTER TABLE tbledit
+MODIFY (DATA varchar2(100) NOT null);
+
+
+-- Case 3.3 컬럼의 자료형 바꾸기 > 테이블 비우고 작업
+ALTER TABLE tbledit
+MODIFY (DATA number);
+
+DESC tbledit; --SQL*Plus > SQL Developer 전용 명령어
+
+DELETE FROM tbledit;
+
+SELECT * FROM tblEdit;
