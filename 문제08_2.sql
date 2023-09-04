@@ -2,7 +2,7 @@
 
 
 -- 1. tblInsa. 남자 급여(기본급+수당)을 (내림차순)순위대로 가져오시오. (이름, 부서, 직위, 급여, 순위 출력)
-SELECT * FROM tblinsa WHERE substr(ssn, 8, 1) = 1 ORDER BY basicpay + sudang desc;
+SELECT name, basicpay + sudang FROM tblinsa WHERE substr(ssn, 8, 1) = 1 ORDER BY basicpay + sudang desc;
 
 SELECT name, buseo, jikwi, basicpay, rnum FROM (SELECT name, buseo, jikwi, basicpay, rownum AS rnum FROM tblinsa WHERE substr(ssn, 8, 1) = 1)
 ORDER BY rnum;
