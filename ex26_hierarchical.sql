@@ -92,13 +92,106 @@ FROM tblcomputer c1				-- 부품(자식)
 -- 계층형 쿼리
 -- 1. start with 절 + connect by 절
 -- 2. 계층형 쿼리에서만 사용 가능한 의사 컬럼들
--- 		a. prior: 자기와 연고나된 부모 레코드를 참조
+-- 		a. prior: 자기와 연관된 부모 레코드를 참조
 --		b. level: 세대수(depth, generation)
 
+COMMIT;
+	
+SELECT 
+	seq AS 번호,
+	lpad(' ', (LEVEL - 1) * 10) || name AS 부품명, -- 들여쓰기
+	PRIOR name AS 부모부품명,
+	level
+FROM tblcomputer
+	START WITH seq = 1 -- 루트 레코드 지정
+		CONNECT BY pseq = PRIOR seq; -- 현재 레코드와 부모 레코드를 연결하는 조건
 
+-- (***) 중요. 외워
+SELECT
+	lpad(' ', (LEVEL - 1) * 10) || name,
+	PRIOR name
+FROM tblself
+	START WITH seq = 1
+		CONNECT BY super = PRIOR seq;
 	
+-- prior: 부모 레코드 참조 > 직속 상사
+-- connect_by_root: 최상위 레코드 참조 > 홍사장
+-- connect_by_isleaf: 말단 노드
 	
-	
-	
-	
-	
+SELECT
+	lpad(' ', (LEVEL - 1) * 10) || name AS 이름,
+	PRIOR name,
+	connect_by_root name, -- 최상위인 루트의 이름, 홍사장
+	connect_by_isleaf, -- 리프노드면 1, 아니면 0
+	sys_connect_by_path(name, '-') -- 루트 노드부터 해당 노드까지의 경로. 문자는 구분자이다.
+FROM tblself
+	START WITH seq = 1
+		CONNECT BY super = PRIOR seq;
+
+-- 정렬
+-- 계층형 쿼리에서의 정렬 - order siblings by
+SELECT 
+	seq AS 번호,
+	lpad(' ', (LEVEL - 1) * 10) || name AS 부품명,
+	PRIOR name AS 부모부품명,
+	level
+FROM tblcomputer
+	START WITH seq = 1
+		CONNECT BY pseq = PRIOR seq
+			ORDER siblings BY name ASC ;
+
+		
+		
+create table tblCategoryBig (
+    seq number primary key,                 --식별자(PK)
+    name varchar2(100) not null             --카테고리명
+);
+
+create table tblCategoryMedium (
+    seq number primary key,                             --식별자(PK)
+    name varchar2(100) not null,                        --카테고리명
+    pseq number not null references tblCategoryBig(seq) --부모카테고리(FK)
+);
+
+create table tblCategorySmall (
+    seq number primary key,                                 --식별자(PK)
+    name varchar2(100) not null,                            --카테고리명
+    pseq number not null references tblCategoryMedium(seq)  --부모카테고리(FK)
+);
+
+
+insert into tblCategoryBig values (1, '카테고리');
+
+insert into tblCategoryMedium values (1, '컴퓨터용품', 1);
+insert into tblCategoryMedium values (2, '운동용품', 1);
+insert into tblCategoryMedium values (3, '먹거리', 1);
+
+insert into tblCategorySmall values (1, '하드웨어', 1);
+insert into tblCategorySmall values (2, '소프트웨어', 1);
+insert into tblCategorySmall values (3, '소모품', 1);
+
+insert into tblCategorySmall values (4, '테니스', 2);
+insert into tblCategorySmall values (5, '골프', 2);
+insert into tblCategorySmall values (6, '달리기', 2);
+
+insert into tblCategorySmall values (7, '밀키트', 3);
+insert into tblCategorySmall values (8, '베이커리', 3);
+insert into tblCategorySmall values (9, '도시락', 3);		
+
+
+SELECT * FROM tblcategorybig;
+SELECT * FROM tblcategorymedium;
+SELECT * FROM tblcategorysmall;
+		
+-- join 하기
+-- depth 고정 > 테이블 따로 생성
+-- depth 미고정 > 자기 참조
+SELECT 
+	b.name AS "상", 
+	m.name AS "중", 
+	s.name AS "하"
+FROM tblcategorybig b
+	INNER JOIN tblcategorymedium m
+		ON b.seq = m.pseq
+			INNER JOIN tblcategorysmall s
+				ON m.seq = s.pseq;

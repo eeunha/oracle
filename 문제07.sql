@@ -17,7 +17,16 @@ WHERE
 	AND hometown = '서울'
 	AND job IS NOT NULL;
 
---?
+
+SELECT 
+	* 
+FROM tbladdressbook 
+WHERE age > (SELECT round(avg(age)) FROM tbladdressbook WHERE gender = 'm') 
+	AND hometown = '서울' 
+	AND job IS NOT null;
+
+
+--? -> city 없음.
 -- employees. 'Munich' 도시에 위치한 부서에 소속된 직원들 명단?
 SELECT * FROM employees;
 
@@ -35,42 +44,72 @@ SELECT * FROM tblmen;
 SELECT * FROM tblwomen;
 
 SELECT 
-	m.name,
+	m.name AS 남자,
+	m.height AS 남자키,
+	m.weight AS 남자몸무게,
+	w.name AS 여자,
+	w.height AS 여자키,
+	w.weight AS 여자몸무게
 FROM tblmen m
 	INNER JOIN tblwomen w
-		ON m.name = w.couple;
+		ON m.couple = w.name;
     
     
 
 -- tblAddressBook. 가장 많은 사람들이 가지고 있는 직업은 주로 어느 지역 태생(hometown)인가?
 SELECT * FROM tbladdressbook;
 
+
 SELECT 
-	hometown
+	job, count(*) AS 수
+FROM tbladdressbook 
+GROUP BY job;
+
+SELECT 
+	count(*) AS 수
+FROM tbladdressbook 
+GROUP BY job;
+
+SELECT
+	job
+FROM (SELECT 
+		job, count(*) AS c
+	FROM tbladdressbook 
+	GROUP BY job)
+WHERE c = max(c);
+	
+
+--답
+SELECT
+	DISTINCT hometown
 FROM tbladdressbook
-WHERE
+WHERE job = (
+	SELECT job 
+	FROM tbladdressbook 
+	GROUP BY job 
+	HAVING count(*) = (
+		SELECT max(count(*)) 
+		FROM tbladdressbook 
+		GROUP BY job))
+ORDER BY hometown ASC;
 
-;
 
-
-SELECT * FROM 
-
-
-SELECT 
-	job,
-	count(job)
-FROM
-	tbladdressbook
-GROUP BY
-	job;
-
-SELECT job FROM tbladdressbook GROUP BY job HAVING count(*) >;
 
 -- tblAddressBook. 이메일 도메인들 중 평균 아이디 길이가 가장 긴 이메일 사이트의 도메인은 무엇인가?
+SELECT 
+	* 
+FROM tbladdressbook;
 
+SELECT 
+	email,
+	length(email),
+	avg(length(email))
+FROM tbladdressbook;   
 
-            
-            
+SELECT 
+	* 
+FROM tbladdressbook
+GROUP BY ;
 
 -- tblAddressBook. 평균 나이가 가장 많은 출신(hometown)들이 가지고 있는 직업 중 가장 많은 직업은?
 

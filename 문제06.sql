@@ -125,5 +125,42 @@ WHERE
 GROUP BY CUBE(substr(address, 1, 2));
 
 
+SELECT 
+	substr(address, 1, instr(address, ' ') - 1)
+FROM tbladdressbook
+WHERE job LIKE '건물주%';
+
+SELECT 
+	* 
+FROM (SELECT 
+			substr(address, 1, instr(address, ' ') - 1)
+		FROM tbladdressbook
+		WHERE job LIKE '건물주%');
+
+SELECT 
+	count(*)
+FROM (SELECT 
+			substr(address, 1, instr(address, ' ') - 1)
+		FROM tbladdressbook
+		WHERE job LIKE '건물주%') a
+GROUP BY 
+	CASE
+		WHEN substr(a.address, 1, instr(a.address, ' ') - 1) = '서울특별시' THEN 1
+		ELSE 2
+	END;
 
 
+-- 최종 답
+SELECT 
+	CASE
+		WHEN substr(address, 1, instr(address, ' ') - 1) = '서울특별시' THEN '서울'
+		ELSE '지방'
+	END AS 거주지, 
+	count(*) AS 수
+FROM tbladdressbook
+WHERE job LIKE '건물주%'
+GROUP BY 
+	CASE
+		WHEN substr(address, 1, instr(address, ' ') - 1) = '서울특별시' THEN '서울'
+		ELSE '지방'
+	END;
