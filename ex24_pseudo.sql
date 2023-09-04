@@ -10,7 +10,7 @@
 	- 현재 테이블의 행번호를 가져오는 역할
 	- 테이블에 저장된 값이 아니라, select 실행 시 동적으로 계산되어 만들어진다.(***)
 	- from절이 실행될 때 각 레코드에 rownum을 할당한다.(*************************)
-	- where절이 실행될 때 상황에 따라 rownum이 재계산된다.(****************0 > from절에서 만들어진 rownum은 where절이 실행될 때 변경될 수 있다.
+	- where절이 실행될 때 상황에 따라 rownum이 재계산된다.(****************) > from절에서 만들어진 rownum은 where절이 실행될 때 변경될 수 있다.
 	
 */
 
@@ -86,7 +86,7 @@ SELECT * FROM tbladdressbook;	-- 2,000 건
 -- 1.
 SELECT * FROM tbladdressbook ORDER BY name ASC;
 
--- 2. 이 떄의 rownum이 필요한다.
+-- 2. 이 때의 rownum이 필요한다.
 SELECT a.*, rownum FROM (
 	SELECT *
 	FROM tbladdressbook 
