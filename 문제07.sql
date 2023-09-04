@@ -53,7 +53,28 @@ SELECT
 FROM tblmen m
 	INNER JOIN tblwomen w
 		ON m.couple = w.name;
-    
+
+-- 답
+SELECT
+	name AS 남자,
+	height AS 남자키,
+	weight AS 남자몸무게,
+	couple AS 여자,
+	(SELECT
+		height
+	FROM
+		tblwomen
+	WHERE
+		tblmen.couple = name) AS 여자키,
+	(SELECT
+		weight
+	FROM
+		tblwomen
+	WHERE
+		tblmen.couple = name) AS 여자몸무게
+FROM tblmen
+WHERE
+	couple IS NOT NULL;
     
 
 -- tblAddressBook. 가장 많은 사람들이 가지고 있는 직업은 주로 어느 지역 태생(hometown)인가?
