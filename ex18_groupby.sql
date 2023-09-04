@@ -11,7 +11,7 @@
     [ORDER BY order_expression [ASC|DESC]]
    
    
-	select 컬럼리스트		4. 컬럼 지정(보고싶은 컬럼만 가져오기)
+	select 컬럼리스트	4. 컬럼 지정(보고싶은 컬럼만 가져오기)
    	from 테이블			1. 테이블 지정
    	where 조건			2. 조건 지정(보고싶은 행만 가져오기)
    	group by 기준		3. (레코드끼리) 그룹을 나눈다. 
