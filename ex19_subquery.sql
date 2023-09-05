@@ -6,7 +6,7 @@
 		- 하나의 문장 안에 하나의 select(insert, update, delete)로 되어 있는 쿼리
 			
 	2. Sub Query, 서브 쿼리, 부속 질의
-		- 하나의 문장 안에 (select, insert, update, delete) 또 다른 문장(select)이 들어있는 쿼리	
+		- 하나의 문장 안에 (select, insert, update, delete) 또 다른 문장(select)이 들어있는 쿼리
 		- 하나의 select 안에 또 다른 select문이 들어있는 쿼리
 		- 삽입 위치 > select절, from절, where절, group by절, having절, order by절
 		- 컬럼(값)을 넣을 수 있는 장소면 서브쿼리가 들어갈 수 있다.

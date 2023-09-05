@@ -237,7 +237,7 @@ create table tblRent (
 
 /*
 	조인, join
-	- (서로 관계를 맺은) 2개(1개) 이상의 테이블을 1개의 결과셋으로 ㅁ나드는 기술
+	- (서로 관계를 맺은) 2개(1개) 이상의 테이블을 1개의 결과셋으로 만드는 기술
 	
 	조인의 종류
 	1. 단순 조인, CROSS JOIN
@@ -273,7 +273,7 @@ SELECT * FROM tblcustomer, tblsales; --Oracle
 		컬럼리스트 
 	from 테이블a
 		inner join 테이블b
-			on 테이블a.pk = 테이블b.f
+			on 테이블a.pk = 테이블b.fk
 */
 
 -- 직원 테이블, 프로젝트 테이블
