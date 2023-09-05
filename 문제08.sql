@@ -193,6 +193,11 @@ SELECT
 FROM employees e 
 	INNER JOIN jobs j 
 		ON e.job_id = j.job_id;
+	
+SELECT job_id, max_salary FROM jobs;
+
+--SELECT * FROM employees WHERE (job_id, salary) in (SELECT job_id, max_salary FROM jobs);
+
 
     
 -- departments, locations. 모든 부서와 각 부서가 위치하고 있는 도시의 이름을 가져오시오.
