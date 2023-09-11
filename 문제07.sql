@@ -76,7 +76,7 @@ FROM tblmen
 WHERE
 	couple IS NOT NULL;
     
-
+-- 몰루
 -- tblAddressBook. 가장 많은 사람들이 가지고 있는 직업은 주로 어느 지역 태생(hometown)인가?
 SELECT * FROM tbladdressbook;
 
@@ -195,32 +195,31 @@ select
     count(case
         when age between 40 and 49 then 1
     end) as 40대
-from (select * from tblAddressBook where job = (select job from tblAddressBook group by job having count(*) = (select max(count(*)) from tblAddressBook group by job)));
-
-select 
-    count(case
-        when age between 10 and 19 then 1
-    end) as 10대,
-    count(case
-        when age between 20 and 29 then 1
-    end) as 20대,
-    count(case
-        when age between 30 and 39 then 1
-    end) as 30대,
-    count(case
-        when age between 40 and 49 then 1
-    end) as 40대
 from tblAddressBook
 where job = (select job from tblAddressBook group by job having count(*) = (select max(count(*)) from tblAddressBook group by job));
 
 
+select 
+    round(count(case
+        when age between 10 and 19 then 1 
+    end) / 332 * 100, 1) || '%'  as "10대",
+    round(count(case
+        when age between 20 and 29 then 1 
+    end) / 332 * 100, 1) || '%'  as "20대",
+    round(count(case
+        when age between 30 and 39 then 1 
+    end) / 332 * 100, 1) || '%'  as "30대",
+    round(count(case
+        when age between 40 and 49 then 1 
+    end) / 332 * 100, 1) || '%'  as "40대"
+from tblAddressBook
+where job = (select job from tblAddressBook group by job having count(*) = (select max(count(*)) from tblAddressBook group by job));
 
 
+select count(*) from tblAddressBook where job = (select job from tblAddressBook group by job having count(*) = (select max(count(*)) from tblAddressBook group by job));
 
 
-
-
-
+-- 저 332만 다른걸로 빼면 된다..... 근데 왜 저건 안될까 ㅠㅠ
 
 
 

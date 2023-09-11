@@ -1592,6 +1592,316 @@ select
 from tblInsa;
 
 
+/*
+    프로시저
+    1. 프로시저
+    2. 함수
+    3. 트리거
+    
+    
+    트리거, Trigger
+    - 프로시저의 한 종류
+    - 개발자의 호출이 아닌, 미리 지정한 특정 사건이 발생하면 시스템이 자동으로 실행하는 프로시저
+    - 예약(사건) > 사건 발생 > 프로시저 호출
+    - 특정 테이블 지정(감시 대상) > 지정 테이블을 오라클이 감시 > insert or update or delete > 미리 준비해놓은 프로시저 호출
+    
+    
+    트리거 구문
+    create or replace trigger 트리거명
+        before|after
+        insert|update|delete
+        on 테이블명
+        [for each row]
+    declare
+        선언부;
+    begin
+        구현부;
+    exception
+        예외처리부;
+    end
+    
+*/
+
+-- tblInsa > 직원 삭제
+create or replace trigger trgInsa
+    before      -- 삭제가 발생하기 직전에 아래의 구현부를 먼저 실행해라! > before trigger
+    delete      -- 삭제가 발생하는지?
+    on tblInsa  -- tblInsa 테이블에서(감시)
+begin
+    dbms_output.put_line(to_char(sysdate, 'hh24:mi:ss') || ' 트리거가 실행되었습니다.');
+    
+    -- 월요일에는 퇴사가 불가능
+    if to_char(sysdate, 'dy') = '월' then
+        -- 강제로 에러 발생
+        -- throw new Exception()
+        -- -20000 ~ -29999
+        raise_application_error(-20001, '월요일에는 퇴사가 불가능합니다.');
+
+    end if;
+    
+end trgInsa; 
+
+
+select * from tblInsa;
+
+delete from tblInsa where num = 1010; -- ORA-02292: integrity constraint (HR.SYS_C007497) violated - child record found
+
+delete from tblBonus;
+commit;
+
+select * from tblBonus;
+
+rollback;
+
+
+-- 로그 기록
+create table tblLogDiary(
+    seq number primary key,
+    message varchar2(1000) not null,
+    regdate date default sysdate not null
+);
+
+create sequence seqLogDiary;
+
+
+create or replace trigger trgDiary
+    after
+    insert or update or delete
+    on tblDiary
+declare
+    vmessage varchar2(1000);
+begin
+    -- dbms_output.put_line(to_char(sysdate, 'hh24:mi:ss') || ' 트리거가 실행되었습니다.');
+    
+    if inserting then
+        -- dbms_output.put_line('추가');
+        vmessage := '새로운 항목이 추가되었습니다.';
+    elsif updating then
+        -- dbms_output.put_line('수정');
+        vmessage := '기존 항목이 수정되었습니다.';
+    elsif deleting then
+        -- dbms_output.put_line('삭제');
+        vmessage := '기존 항목이 삭제되었습니다.';
+    end if;
+    
+    insert into tblLogDiary values (seqLogDiary.nextVal, vmessage, default);
+end trgDiary;
+
+
+insert into tblDiary values (11, '프로시저를 공부했다.', '흐림', sysdate);
+
+update tblDiary set subject = '프로시저를 공부했다.' where seq = 11;
+
+delete from tblDiary where seq = 11;
+
+
+select * from tblLogDiary;
+
+/*
+    [for each row]
+    
+    1. 생략
+        - 문장(Query) 단위 트리거. Table levet trigger
+        - 사건에 적용된 행의 개수 무관 > 트리거 딱 1회 호출
+        - 적용된 레코드의 정보는 중요하지 않은 경우 + 사건 자체가 중요한 경우
+        
+    2. 사용
+        - 행(Record) 단위 트리거
+        - 사건에 적용된 행의 개수만큼 > 트리거가 호출
+        - 적용된 레코드의 정보가 중요한 경우 + 사건 자체보다..
+        - 상관 관계를 사용한다. > 일종의 가상 레코드 > :old, :new
+    
+        insert
+        - :new > 방금 추가된 행
+        
+        update
+        - :old > 수정되기 전 행
+        - :new > 수정된 후 행
+        
+        delete
+        - :old > 삭제되기 전 행
+*/
+
+select * from tblmen;
+
+create or replace trigger trgMen
+    after
+    delete
+    on tblMen
+    --for each row -- 행단위 트리거. 이거 없으면 문장단위 트리거다. 실행된 행의 개수에 맞게 트리거를 실행한다는 뜻.
+begin
+    dbms_output.put_line('레코드를 삭제했습니다.' || :old.name);
+end trgMen;
+
+
+delete from tblMen where name = '홍길동'; -- 1명 삭제 > 트리거 1회 실행
+
+delete from tblMen where age < 25; -- 트리거는 1회 실행 - 출력은 한번만 된다. 하지만 제거는 3개 모두 다 되었다.
+
+rollback;
+
+INSERT INTO tblmen VALUES ('무명씨', 21, 177, 72, NULL);
+INSERT INTO tblmen VALUES ('정형돈', 28, NULL, 92, NULL);
+
+
+
+select * from tblmen;
+
+create or replace trigger trgMen
+    after
+    update
+    on tblMen
+    for each row
+begin
+    dbms_output.put_line('레코드를 수정했습니다. > ' || :old.name);
+    dbms_output.put_line('수정하기 전 나이: ' || :old.age);
+    dbms_output.put_line('수정한 후 나이: ' || :new.age);
+end trgMen;
+
+update tblMen set age = age + 1 where name = '홍길동';
+
+update tblMen set age = age + 1;
+
+
+rollback;
+
+-- 퇴사 > 프로젝트 위임
+select * from tblStaff;
+select * from tblProject;
+
+-- 직원을 퇴사 > 퇴사 바로 직전 > 담당 프로젝트 체크 > 위임
+create or replace trigger trgDeleteStaff
+    before          -- 3. 전에
+    delete          -- 2. 퇴사
+    on tblStaff     -- 1. 직원 테이블에서
+    for each row    -- 4. 해당 직원 정보
+begin
+    
+    -- 5. 위임
+    update tblProject set staff_seq = 3 where staff_seq = :old.seq; -- 퇴사하는 직원 번호
+    
+end trgDeleteStaff;
+
+delete from tblStaff where seq = 2;
+
+
+
+-- 회원 테이블, 게시판 테이블
+-- 포인트 제도
+-- 1. 글 작성 > 포인트 + 100
+-- 2. 글 삭제 > 포인트 - 50
+
+create table tblUser (
+    id varchar2(30) primary key,
+    point number default 1000 not null
+);
+
+create table tblBoard (
+    seq number primary key,
+    subject varchar2(1000) not null,
+    id varchar2(30) not null references tblUser(id)
+);
+
+create sequence seqBoard;
+
+insert into tblUser values ('hong', default);
+
+select * from tblUser;
+select * from tblBoard;
+
+-- A. 글을 쓴다.(삭제한다.)
+-- B. 포인트를 누적(차감)한다.
+
+-- Case 1. Hard
+-- 개발자 직접 제어
+-- 실수 > 일부 업무 누락
+
+-- 1.1 글쓰기
+insert into tblBoard values (seqBoard.nextVal, '게시판입니다.', 'hong');
+
+-- 1.2 포인트 누적하기
+update tblUser set point = point + 100 where id = 'hong';
+
+-- 1.3 글 삭제
+delete from tblBoard where seq = 1;
+
+-- 1.4 포인트 차감하기
+update tblUser set point = point - 50 where id = 'hong';
+
+
+-- Case 2. 프로시저
+create or replace procedure procAddBoard(
+    pid varchar2,
+    psubject varchar2
+)
+is
+begin
+
+    -- 2.1 글쓰기
+    insert into tblBoard values (seqBoard.nextVal, psubject, pid);
+    
+    -- 2.2 포인트 누적하기
+    update tblUser set point = point + 100 where id = pid;
+
+end procAddBoard;
+
+
+create or replace procedure procDeleteBoard(
+    pseq number
+)
+is
+    vid varchar(30);
+begin
+    -- 2.1 삭제글의 작성자?
+    select id into vid from tblBoard where seq = pseq;
+
+    -- 2.2 글 삭제
+    delete from tblBoard where seq = pseq;
+    
+    -- 2.3 포인트 차감하기
+    update tblUser set point = point - 50 where id = vid;
+
+end procDeleteBoard;
+
+begin 
+    -- procAddBoard('hong', '글을 작성합니다.');
+    procDeleteBoard(2);
+end;
+
+select * from tblUser;
+select * from tblBoard;
+
+
+
+-- Case 3. 트리거
+
+create or replace trigger trgBoard
+    after
+    insert or delete
+    on tblBoard
+    for each row
+begin
+    if inserting then
+        update tblUser set point = point + 100 where tblUser.id = :new.id;
+    elsif deleting then
+        update tblUser set point = point - 50 where tblUser.id = :old.id;
+    end if;
+    
+end trgBoard;
+
+insert into tblBoard values (seqBoard.nextVal, '또 다시 글을 씁니다.', 'hong');
+
+delete from tblBoard where seq = 5;
+
+select * from tblUser;
+select * from tblBoard;
+
+
+
+
+
+
+
 
 
 
