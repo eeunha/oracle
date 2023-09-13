@@ -1761,3 +1761,9 @@ insert into tblSchedule (scheduleSeq, teacherSeq, subjectListSeq, progress) valu
 select * from tblSchedule;
 
 commit;
+
+drop table tblCourseList;
+
+select * from tblCourseList;
+
+commit;
