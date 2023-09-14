@@ -840,7 +840,7 @@ commit;
 select * from tblClassroom;
 
 
--- 비품관리
+-- 비품관리 (완료)
 CREATE TABLE tblFixtureMng (
 	fixtureMngSeq NUMBER PRIMARY KEY,
 	fixtureSeq NUMBER NOT NULL REFERENCES tblFixture(fixtureSeq),
