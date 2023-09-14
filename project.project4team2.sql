@@ -1,12 +1,53 @@
+-- 관리자(완료)
+
+--CREATE TABLE tblAdmin (
+--	adminSeq NUMBER NOT NULL PRIMARY KEY,
+--	name VARCHAR2(50) NOT NULL,
+--	ssn VARCHAR2(13) NOT NULL CHECK (LENGTH(ssn) = 7),
+--	tel VARCHAR2(30) NOT NULL CHECK (LENGTH(tel) = 13)
+--);
+--
+--create sequence admin_seq;
+
+
+
+CREATE TABLE tblAdmin (
+	adminSeq NUMBER PRIMARY KEY,
+	name VARCHAR2(50) NOT NULL,
+	ssn VARCHAR2(13) NOT NULL CHECK (LENGTH(ssn) = 7),
+	tel VARCHAR2(30) NOT NULL CHECK (LENGTH(tel) = 13)
+);
+create sequence admin_seq;
+
+
+insert into tblAdmin (adminSeq, name, ssn, tel) values (admin_seq.nextVal, '염현빈', '1534265', '010-8469-9631');
+insert into tblAdmin (adminSeq, name, ssn, tel) values (admin_seq.nextVal, '조성진', '1432698', '010-7739-4145');
+insert into tblAdmin (adminSeq, name, ssn, tel) values (admin_seq.nextVal, '손열음', '2256321', '010-8910-0310');
+insert into tblAdmin (adminSeq, name, ssn, tel) values (admin_seq.nextVal, '임윤찬', '1143642', '010-4211-6713');
+
+select * from tblAdmin;
+
+commit;
+
+
 -- 교사 (완료)
+--CREATE TABLE tblTeacher (
+--	teacherSeq NUMBER PRIMARY KEY,
+--	name VARCHAR2(50) NOT NULL,
+--	ssn VARCHAR2(13) NOT NULL CHECK (LENGTH(ssn) = 7),
+--	tel VARCHAR2(30) CHECK (LENGTH(tel) = 13)
+--);
+--
+--create sequence teacher_seq;
+
 CREATE TABLE tblTeacher (
 	teacherSeq NUMBER PRIMARY KEY,
 	name VARCHAR2(50) NOT NULL,
 	ssn VARCHAR2(13) NOT NULL CHECK (LENGTH(ssn) = 7),
-	tel VARCHAR2(30) CHECK (LENGTH(tel) = 13)
+	tel VARCHAR2(30) NOT NULL CHECK (LENGTH(tel) = 13)
 );
-
 create sequence teacher_seq;
+
 
 insert into tblTeacher (teacherSeq, name, ssn, tel) values (teacher_seq.nextVal, '황은하', '2435467', '010-8847-3920');
 insert into tblTeacher (teacherSeq, name, ssn, tel) values (teacher_seq.nextVal, '김민정', '2836243', '010-2245-8731');
@@ -21,30 +62,22 @@ insert into tblTeacher (teacherSeq, name, ssn, tel) values (teacher_seq.nextVal,
 
 select * from tblTeacher;
 
-
--- 관리자 (완료)
-CREATE TABLE tblAdmin (
-	adminSeq NUMBER NOT NULL PRIMARY KEY,
-	name VARCHAR2(50) NOT NULL,
-	ssn VARCHAR2(13) NOT NULL CHECK (LENGTH(ssn) = 7),
-	tel VARCHAR2(30) NOT NULL CHECK (LENGTH(tel) = 13)
-);
-
-create sequence admin_seq;
-
-insert into tblAdmin (adminSeq, name, ssn, tel) values (admin_seq.nextVal, '염현빈', '1534265', '010-8469-9631');
-insert into tblAdmin (adminSeq, name, ssn, tel) values (admin_seq.nextVal, '조성진', '1432698', '010-7739-4145');
-insert into tblAdmin (adminSeq, name, ssn, tel) values (admin_seq.nextVal, '손열음', '2256321', '010-8910-0310');
-insert into tblAdmin (adminSeq, name, ssn, tel) values (admin_seq.nextVal, '임윤찬', '1143642', '010-4211-6713');
-
-select * from tblAdmin;
+commit;
 
 
--- 비품 (완료)
+-- 비품
+--CREATE TABLE tblFixture (
+--	fixtureSeq NUMBER PRIMARY KEY,
+--	type VARCHAR2(50) NOT NULL,
+--	inUse VARCHAR2(10) DEFAULT '미사용' CHECK (inUse IN ('사용중', '미사용'))
+--);
+--
+--create sequence fixture_seq;
+
 CREATE TABLE tblFixture (
 	fixtureSeq NUMBER PRIMARY KEY,
 	type VARCHAR2(50) NOT NULL,
-	inUse VARCHAR2(10) DEFAULT '미사용' CHECK (inUse IN ('사용중', '미사용'))
+	inUse VARCHAR2(10) DEFAULT '미사용' CHECK (inUse IN ('사용중', '미사용')) NOT NULL
 );
 
 create sequence fixture_seq;
@@ -836,21 +869,45 @@ select * from tblFixture;
 
 commit;
 
-----------------------------
+
+-- 강의실
+CREATE TABLE tblClassroom (
+	classroomName VARCHAR2(30) PRIMARY KEY, 
+	classroomMaxPeople NUMBER NOT NULL 
+);
+
+
+INSERT INTO tblClassroom VALUES ('1',30);
+INSERT INTO tblClassroom VALUES ('2',30);
+INSERT INTO tblClassroom VALUES ('3',30);
+INSERT INTO tblClassroom VALUES ('4',26);
+INSERT INTO tblClassroom VALUES ('5',26);
+INSERT INTO tblClassroom VALUES ('6',26);
+
 select * from tblClassroom;
 
+commit;
 
--- 비품관리 (완료)
+
+-- 비품관리
+--CREATE TABLE tblFixtureMng (
+--	fixtureMngSeq NUMBER PRIMARY KEY,
+--	fixtureSeq NUMBER NOT NULL REFERENCES tblFixture(fixtureSeq),
+--	classroomName VARCHAR2(100) NOT NULL REFERENCES tblClassroom(classroomName)
+--);
+--
+--create sequence fixture_mng_seq;
+
 CREATE TABLE tblFixtureMng (
 	fixtureMngSeq NUMBER PRIMARY KEY,
-	fixtureSeq NUMBER NOT NULL REFERENCES tblFixture(fixtureSeq),
+	fixtureSeq NUMBER REFERENCES tblFixture(fixtureSeq),
 	classroomName VARCHAR2(100) NOT NULL REFERENCES tblClassroom(classroomName)
 );
 
 create sequence fixture_mng_seq;
 
-select * from tblFixtureMng;
 
+select * from tblFixtureMng;
 
 insert into tblFixtureMng (fixtureMngSeq, fixtureSeq, classroomName) values (fixture_mng_seq.nextVal, 1, 1);
 insert into tblFixtureMng (fixtureMngSeq, fixtureSeq, classroomName) values (fixture_mng_seq.nextVal, 2, 1);
@@ -1559,24 +1616,98 @@ select * from tblFixtureMng;
 
 commit;
 
------------------------------------------------------------
-drop table tblAvailableSubject;
-drop sequence as_seq;
 
-CREATE TABLE tblAvailableSubject (
-	asSeq NUMBER PRIMARY KEY,
-	teacherSeq NUMBER NOT NULL REFERENCES tblTeacher(teacherSeq),
-	subSeq NUMBER NOT NULL REFERENCES tblSubject(subSeq)
+-- 과정
+CREATE TABLE tblCourse (
+	courseSeq NUMBER PRIMARY KEY, 
+	courseName VARCHAR2(255) NOT NULL,
+	courseStartDate DATE NOT NULL, 
+	courseFinishDate DATE NOT NULL, 
+	classroomName VARCHAR2(30) NOT NULL references tblClassroom(classroomName), 
+	subjectRegistrationStatus VARCHAR2(100) DEFAULT 'N' NOT NULL check(subjectRegistrationStatus in ('Y', 'N')), 
+	studentNumber NUMBER 
 );
 
-create sequence as_seq;
-
-select * from tblAvailableSubject;
+create sequence course_seq;
 
 
--- null
-drop table tblAvailableSubject;
-drop sequence as_seq;
+INSERT INTO tblCourse VALUES (course_seq.nextVal, '웹 애플리케이션 응용 SW 실무 개발자 양성 과정', TO_DATE('2023-03-14','YYYY-MM-DD') , TO_DATE('2023-10-13','YYYY-MM-DD'),'1','N', 30);
+INSERT INTO tblCourse VALUES (course_seq.nextVal, 'Java&Python 기반 응용SW개발자 양성과정', TO_DATE('2023-02-20','YYYY-MM-DD') , TO_DATE('2023-09-19','YYYY-MM-DD'),'2','N', 30);
+INSERT INTO tblCourse VALUES (course_seq.nextVal, 'Java(자바)& AWS 활용한 Full-Stack 개발자 양성과정', TO_DATE('2023-05-03','YYYY-MM-DD') , TO_DATE('2023-11-02','YYYY-MM-DD'),'3','N', 30);
+INSERT INTO tblCourse VALUES (course_seq.nextVal, '자바(Java)기반 Web & 스마트플랫폼 Full-Stack 개발자 양성과정', TO_DATE('2023-05-29','YYYY-MM-DD') , TO_DATE('2023-11-28','YYYY-MM-DD'),'4','N', 26);
+INSERT INTO tblCourse VALUES (course_seq.nextVal, '자바&스프링 기반 빅데이터 융합 개발자 양성과정', TO_DATE('2023-07-13','YYYY-MM-DD') , TO_DATE('2023-12-26','YYYY-MM-DD'),'5','N', 26);
+INSERT INTO tblCourse VALUES (course_seq.nextVal, 'AWS 클라우드와 Elasticsearch를 활용한 Java Full-Stack 개발자 양성 과정', TO_DATE('2023-07-14','YYYY-MM-DD') , TO_DATE('2023-12-27','YYYY-MM-DD'),'6','N', 26);
+INSERT INTO tblCourse VALUES (course_seq.nextVal, 'Java를 활용한 Full-Stack개발자 양성과정', TO_DATE('2023-11-09','YYYY-MM-DD') , TO_DATE('2024-06-05','YYYY-MM-DD'),'3','N', 30);
+INSERT INTO tblCourse VALUES (course_seq.nextVal, '공공데이터 융합 웹 애플리케이션 개발자 양성과정', TO_DATE('2023-10-26','YYYY-MM-DD') , TO_DATE('2024-05-21','YYYY-MM-DD'),'1','N', 30);
+INSERT INTO tblCourse VALUES (course_seq.nextVal, '공공데이터 융합 자바개발자 양성과정', TO_DATE('2023-09-25','YYYY-MM-DD') , TO_DATE('2024-04-23','YYYY-MM-DD'),'2','N', 30);
+INSERT INTO tblCourse VALUES (course_seq.nextVal, '정보시스템 구축·운영 기반 정보보안 전문가 양성과정', TO_DATE('2023-01-05','YYYY-MM-DD') , TO_DATE('2023-07-04','YYYY-MM-DD'),'5','N', 26);
+INSERT INTO tblCourse VALUES (course_seq.nextVal, 'Python 활용 빅데이터 기반 금융 솔루션 UI 개발자 양성과정', TO_DATE('2022-12-12','YYYY-MM-DD') , TO_DATE('2023-07-11','YYYY-MM-DD'),'6','N', 26);
+INSERT INTO tblCourse VALUES (course_seq.nextVal, '자바기반 반응형 UI/UX 웹 콘텐츠 개발자 양성과정', TO_DATE('2022-12-13','YYYY-MM-DD') , TO_DATE('2023-05-26','YYYY-MM-DD'),'4','N', 26);
+
+select * from tblCourse;
+
+commit;
+
+
+-- 추천도서
+drop table tblRecommendBook;
+drop sequence recommend_book_seq;
+
+CREATE TABLE tblRecommendBook (
+	recommendBookSeq NUMBER PRIMARY KEY,
+	bookName VARCHAR2(255) NOT NULL,
+	author VARCHAR2(100) NOT NULL, 
+	publisherName VARCHAR2(100) NOT NULL, 
+	bookLevel NUMBER NOT NULL, 
+	relatedSubject VARCHAR2(100) NOT NULL 
+);
+
+create sequence recommend_book_seq;
+
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, 'Java의 정석', '남궁성','도우출판', '4', 'JAVA');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '이것이 자바다', '신용권, 임경균','한빛미디어', '4', 'JAVA');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '자바의 정석 기초편', '남궁성','도우출판', '2', 'JAVA');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, 'Do it! 알고리즈 코딩 테스트 자바 편', '김종관','이지스퍼블리싱', '3', 'JAVA');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '그림으로 배우는 Java Programming', 'Mana Takahash','영진닷', '1', 'JAVA');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, 'Java가 보이는 그림책', 'ANK Co., Ltd.','성안당', '1', 'JAVA');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '어서와 Java는 처음이지!', '천인국','인피니티북스', '3', 'JAVA');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '객체지향의 사실과 오해', '조영호','위키북스', '5', 'JAVA');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, 'Do it! 오라클로 배우는 데이터베이스 입문', '이지훈','이지스퍼블리싱', '3', 'Oracle');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '이것이 오라클이다', '우재남','한빛미디어', '4', 'Oracle');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '오라클로 배우는 데이터베이스 개론과 실습', '박우창,남송휘,이현룡','한빛아카데미', '1', 'Oracle');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '김상형의 SQL 정복', '김상형','한빛미디어', '3', 'Oracle');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '뇌를 자극하는 오라클 프로그래밍 SQL&PL/SQL', '홍형경','한빛미디어', '3', 'Oracle');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '코딩 자율학습 HTML + CSS + 자바스크립트', '김기수','길벗', '2', 'HTML/CSS/JavaScript');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, 'Do it! HTML+CSS+자바스크립트 웹 표준의 정석', '고경희','이지스퍼블리싱', '2', 'HTML/CSS/JavaScript');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '완성된 웹사이트로 배우는 HTML&CSS 웹 디자인', 'Mana','한빛미디어', '2', 'HTML/CSS/JavaScript');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '코어 자바스크립트', '정재남','위키북스', '3', 'HTML/CSS/JavaScript');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '모던 자바스크립트 핵심 가이드', '알베르토 몬탈레시','한빛미디어', '3', 'HTML/CSS/JavaScript');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '러닝 자바스크립트', '이선브라운','한빛미디어', '4', 'HTML/CSS/JavaScript');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '최범균의 JSP 2.3 웹 프로그래밍', '최범균','가메출판사', '4', 'Servlet/JSP');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '뇌를 자극하는 JSP & Servlet', '김윤명','한빛미디어', '3', 'Servlet/JSP');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, 'Head First Servlets & JSP', '케이시시에라','한빛미디어', '3', 'Servlet/JSP');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '웹 개발자를 위한 Spring 4.0 프로그래밍', '최범균','가메출판사', '4', 'Spring');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '코드로 배우는 스프링 웹 프로젝트', '구멍가게 코딩단','남가람북스', '3', 'Spring');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '스프링 5 레시피', '마틴 데이넘, 다니엘 루비오, 조시 롱 ','한빛미디어', '5', 'Spring');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '스프링 부트 핵심 가이드', '장정우','위키북스', '3', 'Spring Boot');
+INSERT INTO tblRecommendBook VALUES (recommend_book_seq.nextVal, '코드로 배우는 스프링 부트 웹 프로젝트', '구멍가게코딩단','남가람북스', '3', 'Spring Boot');
+
+select * from tblRecommendBook;
+
+commit;
+
+
+-- 강의 가능 과목
+--drop table tblAvailableSubject;
+--drop sequence as_seq;
+--
+--CREATE TABLE tblAvailableSubject (
+--	asSeq NUMBER PRIMARY KEY,
+--	teacherSeq NUMBER NOT NULL REFERENCES tblTeacher(teacherSeq),
+--	subSeq NUMBER NOT NULL REFERENCES tblSubject(subSeq)
+--);
+--
+--create sequence as_seq;
 
 CREATE TABLE tblAvailableSubject (
 	asSeq NUMBER PRIMARY KEY,
@@ -1585,13 +1716,6 @@ CREATE TABLE tblAvailableSubject (
 );
 
 create sequence as_seq;
-
-select * from tblAvailableSubject;
-
-
-
-
-
 
 insert into tblAvailableSubject (asSeq, teacherSeq, subSeq) values (as_seq.nextVal, 1, 1);
 insert into tblAvailableSubject (asSeq, teacherSeq, subSeq) values (as_seq.nextVal, 1, 2);
@@ -1683,25 +1807,125 @@ insert into tblAvailableSubject (asSeq, teacherSeq, subSeq) values (as_seq.nextV
 insert into tblAvailableSubject (asSeq, teacherSeq, subSeq) values (as_seq.nextVal, 10, 24);
 insert into tblAvailableSubject (asSeq, teacherSeq, subSeq) values (as_seq.nextVal, 10, 30);
 
+select * from tblAvailableSubject;
+
 commit;
 
------------------------
+-- 교육생
+
+-- 과목 목록
+CREATE TABLE tblSubjectList (
+	subjectListSeq NUMBER PRIMARY KEY, 
+	courseSeq NUMBER NOT NULL references tblCourse(courseSeq), 
+	subSeq NUMBER NOT NULL references tblSubject(subSeq), 
+	subjectStartDate DATE NOT NULL, 
+	subjectFinishDate DATE NOT NULL,
+	bookSeq NUMBER NOT NULL references tblBook(bookSeq), 
+	teacherSeq NUMBER NOT NULL references tblTeacher(teacherSeq) 
+);
+
+create sequence subject_list_seq;
+
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 1,1, TO_DATE('2023-03-14','YYYY-MM-DD') , TO_DATE('2023-04-13','YYYY-MM-DD'),13,1);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 1,2, TO_DATE('2023-04-14','YYYY-MM-DD') , TO_DATE('2023-05-15','YYYY-MM-DD'),5,1);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 1,4, TO_DATE('2023-05-16','YYYY-MM-DD') , TO_DATE('2023-06-10','YYYY-MM-DD'),1,1);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 1,26, TO_DATE('2023-06-11','YYYY-MM-DD') , TO_DATE('2023-07-13','YYYY-MM-DD'),31,1);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 1,16, TO_DATE('2023-07-14','YYYY-MM-DD') , TO_DATE('2023-08-31','YYYY-MM-DD'),32,1);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 1,34, TO_DATE('2023-09-01','YYYY-MM-DD') , TO_DATE('2023-10-13','YYYY-MM-DD'),11,1);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 2,1, TO_DATE('2023-02-20','YYYY-MM-DD') , TO_DATE('2023-03-31','YYYY-MM-DD'),17,2);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 2,2, TO_DATE('2023-04-01','YYYY-MM-DD') , TO_DATE('2023-05-04','YYYY-MM-DD'),22,2);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 2,4, TO_DATE('2023-05-05','YYYY-MM-DD') , TO_DATE('2023-06-11','YYYY-MM-DD'),1,2);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 2,9, TO_DATE('2023-06-12','YYYY-MM-DD') , TO_DATE('2023-07-20','YYYY-MM-DD'),9,2);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 2,12, TO_DATE('2023-07-21','YYYY-MM-DD') , TO_DATE('2023-08-10','YYYY-MM-DD'),21,2);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 2,15, TO_DATE('2023-08-11','YYYY-MM-DD') , TO_DATE('2023-09-19','YYYY-MM-DD'),29,2);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 3,1, TO_DATE('2023-05-03','YYYY-MM-DD') , TO_DATE('2023-06-01','YYYY-MM-DD'),23,3);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 3,2, TO_DATE('2023-06-02','YYYY-MM-DD') , TO_DATE('2023-06-30','YYYY-MM-DD'),22,3);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 3,4, TO_DATE('2023-07-01','YYYY-MM-DD') , TO_DATE('2023-08-05','YYYY-MM-DD'),1,3);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 3,3, TO_DATE('2023-08-06','YYYY-MM-DD') , TO_DATE('2023-08-31','YYYY-MM-DD'),14,3);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 3,29, TO_DATE('2023-09-01','YYYY-MM-DD') , TO_DATE('2023-09-26','YYYY-MM-DD'),33,3);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 3,33, TO_DATE('2023-09-27','YYYY-MM-DD') , TO_DATE('2023-11-02','YYYY-MM-DD'),9,3);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 4,1, TO_DATE('2023-05-29','YYYY-MM-DD') , TO_DATE('2023-06-30','YYYY-MM-DD'),18,4);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 4,2, TO_DATE('2023-07-01','YYYY-MM-DD') , TO_DATE('2023-07-28','YYYY-MM-DD'),5,4);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 4,4, TO_DATE('2023-07-29','YYYY-MM-DD') , TO_DATE('2023-08-25','YYYY-MM-DD'),1,4);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 4,35, TO_DATE('2023-08-26','YYYY-MM-DD') , TO_DATE('2023-09-23','YYYY-MM-DD'),41,4);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 4,19, TO_DATE('2023-09-24','YYYY-MM-DD') , TO_DATE('2023-10-14','YYYY-MM-DD'),30,4);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 4,8, TO_DATE('2023-10-15','YYYY-MM-DD') , TO_DATE('2023-11-28','YYYY-MM-DD'),16,4);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 5,1, TO_DATE('2023-07-13','YYYY-MM-DD') , TO_DATE('2023-08-09','YYYY-MM-DD'),13,5);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 5,2, TO_DATE('2023-08-10','YYYY-MM-DD') , TO_DATE('2023-09-02','YYYY-MM-DD'),22,5);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 5,4, TO_DATE('2023-09-03','YYYY-MM-DD') , TO_DATE('2023-09-27','YYYY-MM-DD'),1,5);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 5,12, TO_DATE('2023-09-28','YYYY-MM-DD') , TO_DATE('2023-10-20','YYYY-MM-DD'),21,5);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 5,15, TO_DATE('2023-10-21','YYYY-MM-DD') , TO_DATE('2023-11-23','YYYY-MM-DD'),29,5);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 5,11, TO_DATE('2023-11-24','YYYY-MM-DD') , TO_DATE('2023-12-26','YYYY-MM-DD'),25,5);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 6,1, TO_DATE('2023-07-14','YYYY-MM-DD') , TO_DATE('2023-09-01','YYYY-MM-DD'),17,6);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 6,2, TO_DATE('2023-09-02','YYYY-MM-DD') , TO_DATE('2023-09-30','YYYY-MM-DD'),5,6);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 6,4, TO_DATE('2023-10-01','YYYY-MM-DD') , TO_DATE('2023-10-13','YYYY-MM-DD'),1,6);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 6,3, TO_DATE('2023-10-14','YYYY-MM-DD') , TO_DATE('2023-11-03','YYYY-MM-DD'),3,6);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 6,16, TO_DATE('2023-11-04','YYYY-MM-DD') , TO_DATE('2023-12-01','YYYY-MM-DD'),32,6);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 6,31, TO_DATE('2023-12-02','YYYY-MM-DD') , TO_DATE('2023-12-27','YYYY-MM-DD'),22,6);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 7,1, TO_DATE('2023-11-09','YYYY-MM-DD') , TO_DATE('2024-01-01','YYYY-MM-DD'),18,7);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 7,2, TO_DATE('2024-01-02','YYYY-MM-DD') , TO_DATE('2024-01-31','YYYY-MM-DD'),22,7);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 7,4, TO_DATE('2024-02-01','YYYY-MM-DD') , TO_DATE('2024-02-25','YYYY-MM-DD'),1,7);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 7,13, TO_DATE('2024-02-26','YYYY-MM-DD') , TO_DATE('2024-04-02','YYYY-MM-DD'),21,7);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 7,28, TO_DATE('2024-04-03','YYYY-MM-DD') , TO_DATE('2024-05-03','YYYY-MM-DD'),35,7);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 7,7, TO_DATE('2024-05-04','YYYY-MM-DD') , TO_DATE('2024-06-05','YYYY-MM-DD'),16,7);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 8,1, TO_DATE('2023-10-26','YYYY-MM-DD') , TO_DATE('2023-12-27','YYYY-MM-DD'),23,8);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 8,2, TO_DATE('2023-12-28','YYYY-MM-DD') , TO_DATE('2024-01-29','YYYY-MM-DD'),5,8);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 8,4, TO_DATE('2024-01-30','YYYY-MM-DD') , TO_DATE('2024-02-26','YYYY-MM-DD'),1,8);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 8,33, TO_DATE('2024-02-27','YYYY-MM-DD') , TO_DATE('2024-03-30','YYYY-MM-DD'),9,8);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 8,25, TO_DATE('2024-03-31','YYYY-MM-DD') , TO_DATE('2024-04-27','YYYY-MM-DD'),39,8);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 8,19, TO_DATE('2024-04-28','YYYY-MM-DD') , TO_DATE('2024-05-21','YYYY-MM-DD'),30,8);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 9,1, TO_DATE('2023-09-25','YYYY-MM-DD') , TO_DATE('2023-12-15','YYYY-MM-DD'),13,9);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 9,2, TO_DATE('2023-12-16','YYYY-MM-DD') , TO_DATE('2024-01-14','YYYY-MM-DD'),5,9);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 9,4, TO_DATE('2024-01-15','YYYY-MM-DD') , TO_DATE('2024-02-03','YYYY-MM-DD'),1,9);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 9,21, TO_DATE('2024-02-04','YYYY-MM-DD') , TO_DATE('2024-02-24','YYYY-MM-DD'),36,9);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 9,33, TO_DATE('2024-02-25','YYYY-MM-DD') , TO_DATE('2024-03-28','YYYY-MM-DD'),9,9);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 9,6, TO_DATE('2024-03-29','YYYY-MM-DD') , TO_DATE('2024-04-23','YYYY-MM-DD'),32,9);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 10,1, TO_DATE('2023-01-05','YYYY-MM-DD') , TO_DATE('2023-02-16','YYYY-MM-DD'),17,10);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 10,2, TO_DATE('2023-02-17','YYYY-MM-DD') , TO_DATE('2023-03-03','YYYY-MM-DD'),22,10);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 10,4, TO_DATE('2023-03-04','YYYY-MM-DD') , TO_DATE('2023-04-01','YYYY-MM-DD'),1,10);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 10,16, TO_DATE('2023-04-02','YYYY-MM-DD') , TO_DATE('2023-05-10','YYYY-MM-DD'),32,10);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 10,22, TO_DATE('2023-05-11','YYYY-MM-DD') , TO_DATE('2023-06-04','YYYY-MM-DD'),40,10);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 10,30, TO_DATE('2023-06-05','YYYY-MM-DD') , TO_DATE('2023-07-04','YYYY-MM-DD'),38,10);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 11,1, TO_DATE('2022-12-12','YYYY-MM-DD') , TO_DATE('2023-01-15','YYYY-MM-DD'),23,6);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 11,2, TO_DATE('2023-01-16','YYYY-MM-DD') , TO_DATE('2023-02-18','YYYY-MM-DD'),5,1);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 11,4, TO_DATE('2023-02-19','YYYY-MM-DD') , TO_DATE('2023-03-21','YYYY-MM-DD'),1,4);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 11,15, TO_DATE('2023-03-22','YYYY-MM-DD') , TO_DATE('2023-04-29','YYYY-MM-DD'),29,3);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 11,17, TO_DATE('2023-04-30','YYYY-MM-DD') , TO_DATE('2023-05-27','YYYY-MM-DD'),37,9);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 11,28, TO_DATE('2023-05-28','YYYY-MM-DD') , TO_DATE('2023-07-11','YYYY-MM-DD'),35,6);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 12,1, TO_DATE('2022-12-13','YYYY-MM-DD') , TO_DATE('2023-01-04','YYYY-MM-DD'),18,10);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 12,2, TO_DATE('2023-01-05','YYYY-MM-DD') , TO_DATE('2023-01-27','YYYY-MM-DD'),22,9);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 12,4, TO_DATE('2023-01-28','YYYY-MM-DD') , TO_DATE('2023-02-23','YYYY-MM-DD'),1,9);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 12,5, TO_DATE('2023-02-24','YYYY-MM-DD') , TO_DATE('2023-03-20','YYYY-MM-DD'),26,8);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 12,20, TO_DATE('2023-03-21','YYYY-MM-DD') , TO_DATE('2023-04-24','YYYY-MM-DD'),34,8);
+INSERT INTO tblSubjectList VALUES (subject_list_seq.nextVal, 12,11, TO_DATE('2023-04-25','YYYY-MM-DD') , TO_DATE('2023-05-26','YYYY-MM-DD'),21,7);
+
+select * from tblSubjectList;
+
+commit;
+
+
+-- 강의 스케줄
+
 DROP TABLE tblSchedule;
 drop sequence schedule_seq;
 
+--CREATE TABLE tblSchedule (
+--	scheduleSeq NUMBER PRIMARY KEY,
+--	teacherSeq NUMBER NOT NULL REFERENCES tblTeacher(teacherSeq),
+--	subjectListSeq NUMBER NOT NULL REFERENCES tblSubjectList(subjectListSeq),
+--	progress VARCHAR2(30) CHECK (progress IN ('강의예정', '강의중', '강의종료')) NOT NULL
+--);
+--
+--create sequence schedule_seq;
+
 CREATE TABLE tblSchedule (
 	scheduleSeq NUMBER PRIMARY KEY,
-	teacherSeq NUMBER NOT NULL REFERENCES tblTeacher(teacherSeq),
-	subjectListSeq NUMBER NOT NULL REFERENCES tblSubjectList(subjectListSeq),
-	progress VARCHAR2(30) CHECK (progress IN ('강의예정', '강의중', '강의종료')) NOT NULL
+	teacherSeq NUMBER REFERENCES tblTeacher(teacherSeq),
+	subjectListSeq NUMBER REFERENCES tblSubjectList(subjectListSeq),
+	progress VARCHAR2(30) NOT NULL CHECK (progress IN ('강의예정', '강의중', '강의종료')) 
 );
 
 create sequence schedule_seq;
-
-
-select * from tblSchedule;
-
-
 
 insert into tblSchedule (scheduleSeq, teacherSeq, subjectListSeq, progress) values (schedule_seq.nextVal, 1, 1, '강의종료');
 insert into tblSchedule (scheduleSeq, teacherSeq, subjectListSeq, progress) values (schedule_seq.nextVal, 1, 2, '강의종료');
@@ -1776,89 +2000,201 @@ insert into tblSchedule (scheduleSeq, teacherSeq, subjectListSeq, progress) valu
 insert into tblSchedule (scheduleSeq, teacherSeq, subjectListSeq, progress) values (schedule_seq.nextVal, 10, 60, '강의종료');
 insert into tblSchedule (scheduleSeq, teacherSeq, subjectListSeq, progress) values (schedule_seq.nextVal, 10, 67, '강의종료');
 
-
 select * from tblSchedule;
 
 commit;
 
-drop table tblCourseList;
 
-select * from tblCourseList;
+-- 사물함
+
+CREATE TABLE tblLocker (
+	lockerSeq NUMBER PRIMARY KEY, 
+	studentSeq NUMBER references tblStudent(studentSeq)
+);
+
+create sequence locker_seq;
+
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 1);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 2);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 3);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 4);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 5);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 6);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 7);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 8);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 9);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 10);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 11);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 12);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 13);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 14);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 15);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 16);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 17);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 18);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 19);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 20);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 21);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 22);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 23);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 24);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 25);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 26);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 27);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 28);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 29);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 30);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 31);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 32);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 33);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 34);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 35);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 36);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 37);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 38);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 39);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 40);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 41);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 42);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 43);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 44);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 45);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 46);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 47);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 48);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 49);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 50);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 51);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 52);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 53);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 54);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 55);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 56);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 57);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 58);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 59);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 60);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 61);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 62);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 63);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 64);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 65);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 66);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 67);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 68);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 69);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 70);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 71);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 72);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 73);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 74);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 75);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 76);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 77);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 78);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 79);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 80);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 81);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 82);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 83);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 84);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 85);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 86);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 87);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 88);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 89);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 90);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 91);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 92);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 93);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 94);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 95);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 96);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 97);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 98);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 99);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 100);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 101);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 102);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 103);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 104);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 105);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 106);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 107);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 108);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 109);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 110);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 111);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 112);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 113);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 114);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 115);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 116);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 117);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 118);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 119);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 120);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 121);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 122);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 123);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 124);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 125);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 126);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 127);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 128);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 129);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 130);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 131);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 132);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 133);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 134);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 135);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 136);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 137);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 138);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 139);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 140);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 141);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 142);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 143);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 144);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 145);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 146);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 147);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 148);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 149);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 150);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 151);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 152);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 153);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 154);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 155);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 156);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 157);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 158);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 159);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 160);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 161);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 162);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 163);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 164);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 165);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 166);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 167);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, 168);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, NULL);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, NULL);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, NULL);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, NULL);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, NULL);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, NULL);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, NULL);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, NULL);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, NULL);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, NULL);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, NULL);
+INSERT INTO tblLocker VALUES (locker_seq.nextval, NULL);
+
+select * from tblLocker;
 
 commit;
-
-
-------------------
--- 교사 조회하기
-create or replace procedure procTeacherList
-is
-    cursor vcursor
-    is
-    select * from tblTeacher;
-    vrow tblTeacher%rowtype;
-begin
-    dbms_output.put_line('교사번호' || ' ' || '이름' || '     ' || '전화번호');
-    open vcursor;
-        loop
-            fetch vcursor into vrow;
-            exit when vcursor%notfound;
-            
-            dbms_output.put_line('    ' || vrow.teacherseq || ' ' || vrow.name || ' ' || vrow.tel);
-            
-        end loop;
-    close vcursor;
-end;
-
-set serveroutput on;
-
-begin
-    procTeacherList;
-end;
-
-select * from tblTeacher;
-
-
-declare
-    cursor vcursor
-    is
-    select * from tblInsa;
-    vrow tblInsa%rowtype;
-begin
-    open vcursor;
-        loop
-            fetch vcursor into vrow;
-            exit when vcursor%notfound;
-            
-            dbms_output.put_line(vrow.name);
-            
-        end loop;
-    close vcursor;
-end;
-
-
-create or replace procedure procBuseo (
-    pbuseo in varchar2,
-    pcursor out sys_refcursor --커서의 자료형 
-)
-is
-    -- cursor vcursor is select..   > 내부 소비 시 이렇게 사용
-begin
-    open pcursor
-    for 
-    select * from tblInsa where buseo = pbuseo;
-end procBuseo;
-
-
-declare
-    vcursor sys_refcursor; -- 커서 참조변수
-    vrow tblInsa%rowtype;
-begin
-    procBuseo('영업부', vcursor);
-    loop
-        fetch vcursor into vrow;
-        exit when vcursor%notfound;
-        
-        -- 업무
-        dbms_output.put_line(vrow.name);
-    end loop;
-end;
