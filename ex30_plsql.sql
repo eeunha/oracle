@@ -72,7 +72,7 @@
 
 -- syso 하기위한 설정 변경
 set serveroutput off;
-set serveroutput on; -- 현재 세션에서만 유효(접속 해재 > 초기화)
+set serveroutput on; -- 현재 세션에서만 유효(접속 해제 > 초기화)
 set serverout on;
 
 -- 익명 프로시저
