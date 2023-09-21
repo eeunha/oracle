@@ -1,12 +1,7 @@
 -- 출결
+
 -- 교사가 수업한 과정만 조회 가능
--- > 과목목록번호에서 교사번호 검색하면서 유효성 검사는 나중에
-
 -- 교사가 수업하는 올바른 과정번호로 입력한다는 가정 하에 진행.
-
--- ex) 1번교사 1번과목목록번호 1번과정 1번과목
-
---select * from tblsubjectlist;
 
 -- 과정별 출결 조회 테이블 가져오기
 create or replace procedure procGetCourseAtt(
@@ -34,24 +29,6 @@ exception
     when others then
         dbms_output.put_line('예외 처리');
 end procGetCourseAtt;
-
---declare
---    vcursor sys_refcursor;
---    
---    vseq tblstudent.studentseq%type;
---    vname tblstudent.name%type;
---    vdate tblattendance.attendancedate%type;
---    vstatus tblattendance.attendancestatus%type;
---begin
---    procGetCourseAtt(1, vcursor);
---    
---    loop
---        fetch vcursor into vseq, vname, vdate, vstatus; 
---        exit when vcursor%notfound;
---            dbms_output.put_line('교육생번호: ' || vseq || '   교육생이름: ' || vname || '   날짜: ' || vdate || '   출결여부: ' || vstatus);
---    end loop;
---
---end;
 
 
 -- 과정별 출결 조회하기
@@ -141,32 +118,11 @@ end;
 --    when others then
 --        dbms_output.put_line('예외 처리');
 --end procGetYmAtt;
+----
+----
+----select * from tblstudent;
+----exec dbms_output.enable('500000000');
 --
---
---select * from tblstudent;
---exec dbms_output.enable('500000000');
---
---
---declare
---    vcursor sys_refcursor;
---    vcourseseq tblcourse.courseseq%type;
---    vcoursename tblcourse.coursename%type;
---    vstdseq tblstudent.studentseq%type;
---    vstdname tblstudent.name%type;
---    vdate tblattendance.attendancedate%type;
---    vstatus tblattendance.attendancestatus%type;
---begin
---    procGetYmAtt(1, '20230601', '20230630', vcursor);
---    
---    loop 
---        fetch vcursor into vcourseseq, vcoursename, vstdseq, vstdname, vdate, vstatus;
---        exit when vcursor%notfound;
---            dbms_output.put_line('과정번호: ' || vcourseseq || '   과정명: ' || vcoursename || '   교육생번호: ' || vstdseq || '   교육생이름: ' || vstdname || '   날짜: ' || vdate || '   출결여부: ' || vstatus);
---    end loop;
---exception
---    when others then
---        dbms_output.put_line('오류');
---end;
 --
 ---- 해당 년월 출결 조회하기
 --create or replace procedure procPrintYmAtt(
@@ -186,7 +142,7 @@ end;
 --    dbms_output.put_line(venddate);
 --    
 --    -- 테이블 가져오기
---    procGetYmAtt
+--    procGetYmAtt(pteacherseq, vstartdate, venddate);
 --    
 --exception
 --    when NO_DATA_FOUND then
@@ -195,12 +151,12 @@ end;
 --    when others then
 --        dbms_output.put_line('예외 처리');
 --end procPrintYmAtt;
---
---
+----
+----
 ---- 실행
---begin
---    procPrintYmAtt(1, '202304');
---end;
+----begin
+----    procPrintYmAtt(1, '202304');
+----end;
 
 
 -- 특정 기간 조회
@@ -319,27 +275,6 @@ exception
 end procGetYmdAtt;
 
 
---declare
---    vcursor sys_refcursor;
---    
---    vcourseseq tblcourse.courseseq%type;
---    vcoursename tblcourse.coursename%type;
---    vstdseq tblstudent.studentseq%type;
---    vstdname tblstudent.name%type;
---    vdate tblattendance.attendancedate%type;
---    vstatus tblattendance.attendancestatus%type;
---begin
---    procGetYmdAtt(1, '2023-07-05', vcursor);
---    
---    loop
---        fetch vcursor into vcourseseq, vcoursename, vstdseq, vstdname, vdate, vstatus; 
---        exit when vcursor%notfound;
---            dbms_output.put_line('과정번호: ' || vcourseseq || '   과정명: ' || vcoursename || '   교육생번호: ' || vstdseq || '   교육생이름: ' || vstdname || '   날짜: ' || vdate || '   출결여부: ' || vstatus);
---    end loop;
---
---end;
-
-
 -- 특정 년월일 조회하기
 create or replace procedure procPrintYmdAtt(
     pteacherseq number,
@@ -387,7 +322,8 @@ end procPrintYmdAtt;
 
 -- 실행
 begin
-    procPrintYmdAtt(1, '20230702');
+--    procPrintYmdAtt(1, '20230702'); -- 주말
+    procPrintYmdAtt(1, '20230705');
 end;
 
 
@@ -395,8 +331,6 @@ end;
 -- 교육생 별 출결 조회
 
 -- 해당 교사의 수업을 듣는 교육생의 번호가 올바로 들어온다고 가정.
-
--- ex) 1번 교육생
 
 -- 교육생 출결테이블 가져오기
 create or replace procedure procGetStdAtt(
@@ -408,17 +342,6 @@ is
 begin
     open pcursor
     for
---    select 
---        a.courseseq as 과정번호, c.coursename as 과정명, a.attendancedate as 날짜, a.attendancestatus as 출결여부
---    from tblattendance a
---        inner join tblstudent s
---            on a.studentseq = s.studentseq
---                inner join tblcourse c
---                    on s.processseq = c.courseseq
---                        inner join tblsubjectlist sl
---                            on c.courseseq = sl.courseseq
---    where a.studentseq = pstdseq and sl.teacherseq = pteacherseq;
---    
     select 
         distinct a.courseseq as 과정번호, c.coursename as 과정명, a.attendancedate as 날짜, a.attendancestatus as 출결여부
     from tblattendance a
@@ -439,25 +362,6 @@ exception
 end procGetStdAtt;
 
 
---declare
---    vcursor sys_refcursor;
---    
---    vseq tblcourse.courseseq%type;
---    vname tblcourse.coursename%type;
---    vdate tblattendance.attendancedate%type;
---    vstatus tblattendance.attendancestatus%type;
---begin
---    procGetStdAtt(1, 1, vcursor);
---    
---    loop
---        fetch vcursor into vseq, vname, vdate, vstatus; 
---        exit when vcursor%notfound;
---            dbms_output.put_line('과정번호: ' || vseq || '   과정명: ' || vname || '   날짜: ' || vdate || '   출결여부: ' || vstatus);
---    end loop;
---
---end;
-
-
 -- 교육생 이름 가져오기
 create or replace procedure procGetStdName(
     pstdseq number,
@@ -473,13 +377,6 @@ exception
     when others then
         dbms_output.put_line('예외 처리');
 end procGetStdName;
-
---declare
---    vresult varchar2(50);
---begin
---    procGetStdName(1, vresult);
---    dbms_output.put_line(vresult);
---end;
 
 
 -- 교육생 별 출결 조회하기

@@ -69,7 +69,7 @@ begin
     procGetTeacherName(pteacherseq, vteachername);
     dbms_output.put_line('교사번호: ' || pteacherseq || '  교사명:  ' || vteachername); 
     
-    dbms_output.put_line('-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------');
+    dbms_output.put_line('-----------------------------------------------------------------------------------------------------------------------------------------');
     
     -- 해당 교사 스케줄 가져오기
     procGetTFinishedSubScore(pteacherseq, vcursor);
@@ -94,7 +94,10 @@ begin
                 vpgradechar := 'null';
             end if;
             
-            dbms_output.put_line('과목번호: ' || vsubseq || '   과정번호: ' || vcourseseq || '   과정명: ' || vcoursename ||'   과정시작일: ' || vcoursestartdate || '   과정종료일: ' || vcoursefinishdate || '   과목명: ' || vsubname || '   과목시작일: ' || vsubjectstartdate || '   과목종료일: ' || vsubjectfinishdate || '   교재명: ' || vbookname || '   출결배점: ' || vattgradechar || '   필기배점: ' || vwgradechar || '   실기배점: ' || vpgradechar || '   필기시험점수등록여부: ' || vwrtscorereg || '   실기시험점수등록여부: ' || vprctscorereg);
+            dbms_output.put_line('-----------------------------------------------------------------------------------------------------------------------------------------');
+            dbms_output.put_line('과정번호: ' || vcourseseq || '   과정명: ' || vcoursename ||'   과정시작일: ' || vcoursestartdate || '   과정종료일: ' || vcoursefinishdate);
+            dbms_output.put_line('과목번호: ' || vsubseq || '   과목명: ' || vsubname || '   과목시작일: ' || vsubjectstartdate || '   과목종료일: ' || vsubjectfinishdate || '   교재명: ' || vbookname);
+            dbms_output.put_line('출결배점: ' || vattgradechar || '   필기배점: ' || vwgradechar || '   실기배점: ' || vpgradechar || '   필기시험점수등록여부: ' || vwrtscorereg || '   실기시험점수등록여부: ' || vprctscorereg);
     end loop;
 exception
     when NO_DATA_FOUND then
@@ -196,7 +199,7 @@ begin
     procGetSubjectName(psubseq, vsubjectname);
     dbms_output.put_line('과목번호: '  || psubseq ||'   과목명: ' || vsubjectname);
     
-    dbms_output.put_line('------------------------------------------------------------------------------------------------------------------');
+    dbms_output.put_line('---------------------------------------------------------------------');
     
     -- 교육생 목록 출력하기
     procGetCourseStdScoreList(vsublistseq, vcursor);
@@ -230,11 +233,16 @@ begin
                 vprctscorechar := 'null';
             end if;
             
+            dbms_output.put_line('---------------------------------------------------------------------');
+            dbms_output.put_line('교육생번호: ' || vstudentseq || '   교육생이름: ' || vname || '   전화번호: ' || vphone);
+            
             if vstatuschar = '중도탈락' then -- 중도탈락일도 출력
-                dbms_output.put_line('교육생번호: ' || vstudentseq || '   교육생이름: ' || vname || '   전화번호: ' || vphone || '   수료|중도탈락 여부: ' || vstatuschar || '   수료|중도탈락일: ' || vstatusdatechar || '   출결성적: ' || vattscorechar || '   필기성적: ' || vwrtscorechar || '   실기성적: ' || vprctscorechar);    
+                dbms_output.put_line('수료|중도탈락 여부: ' || vstatuschar || '   수료|중도탈락일: ' || vstatusdatechar);
             else
-                dbms_output.put_line('교육생번호: ' || vstudentseq || '   교육생이름: ' || vname || '   전화번호: ' || vphone || '   수료|중도탈락 여부: ' || vstatuschar || '   출결성적: ' || vattscorechar || '   필기성적: ' || vwrtscorechar || '   실기성적: ' || vprctscorechar);
+                dbms_output.put_line('수료|중도탈락 여부: ' || vstatuschar);
             end if;
+            
+            dbms_output.put_line('출결성적: ' || vattscorechar || '   필기성적: ' || vwrtscorechar || '   실기성적: ' || vprctscorechar);
             
     end loop;
 exception
@@ -273,14 +281,6 @@ exception
 end procGetStdWrtScore;
 
 
---declare
---    vresult number;
---begin
---    procGetStdWrtScore(67, 13, vresult);
---    dbms_output.put_line(vresult);
---end;
-
-
 -- 필기 배점 가져오기
 create or replace procedure procGetWrtGrade(
     psublistseq number,
@@ -296,13 +296,6 @@ exception
     when others then
         dbms_output.put_line('예외 처리');
 end procGetWrtGrade;
-
---declare 
---    vresult number;
---begin
---    procGetWrtGrade(13, vresult);
---    dbms_output.put_line(vresult);
---end;
 
 
 -- 학생의 중도탈락여부 가져오기
@@ -320,14 +313,6 @@ exception
     when others then
         dbms_output.put_line('예외 처리');
 end procGetStdDropStatus;
-
-
---declare
---    vresult tblstudent.compldropstatus%type;
---begin
---    procGetStdDropStatus(66, vresult);
---    dbms_output.put_line(vresult);
---end;
 
 
 -- 중도탈락일 가져오기
@@ -364,16 +349,6 @@ exception
 end procGetSubFDate;
 
 
---declare
---    vresult date;
---begin
---    procGetSubFDate(13, vresult);
---    dbms_output.put_line(vresult);
---end;
-
-
---select * from tblscoretest;
-
 -- 모든 학생의 필기성적이 등록되었는지 확인 후 성적등록여부에 값 수정
 create or replace procedure procSetWScoreRegStatus(
     psublistseq number
@@ -385,7 +360,6 @@ is
 begin    
     -- 해당 과목의 필기성적이 매겨진 학생 수 세기
     select count(*) into vwcount from tblscoreinfo where subjectlistseq = psublistseq and writingscore is not null; 
---    dbms_output.put_line(vwcount);
     
     -- 과정번호 찾기
     select courseseq into vcourseseq from tblsubjectlist where subjectlistseq = psublistseq;
@@ -499,13 +473,6 @@ begin
 --    11번학생 1번과정 26번과목
 end;
 
--- 확인
-select * from tblscoreinfo where studentseq = 66;
-
-select * from tblscoreinfo where studentseq = 1;
-
-select * from tblsubjectlist where subjectlistseq = 6;
-
 
 -- 3.2. 실기 성적 등록
 
@@ -527,14 +494,6 @@ exception
 end procGetStdPrctScore;
 
 
---declare
---    vresult number;
---begin
---    procGetStPrctScore(66, 13, vresult);
---    dbms_output.put_line(vresult);
---end;
-
-
 -- 실기 배점 가져오기
 create or replace procedure procGetPrctGrade(
     psublistseq number,
@@ -550,13 +509,6 @@ exception
     when others then
         dbms_output.put_line('예외 처리');
 end procGetPrctGrade;
-
---declare 
---    vresult number;
---begin
---    procGetPrctGrade(13, vresult);
---    dbms_output.put_line(vresult);
---end;
 
 
 -- 모든 학생의 실기성적이 등록되었는지 확인 후 성적등록여부에 값 수정
@@ -596,10 +548,6 @@ exception
 
 end procSetPScoreRegStatus;
 
-
-
-select * from tblsubjectgrade;
-select * from tblscoreinfo;
 
 -- 실기 성적 등록하기
 create or replace procedure procSetStdPrctScore(
@@ -694,39 +642,6 @@ begin
 end;
 
 
-
--- 확인
---select * from tblscoreinfo where studentseq = 66;
-
-
-
--- 찐확인
-select * from tblsubjectlist;
-select * from tblscoreinfo where subjectlistseq = 1;
-select * from tblscoretest where subjectlistseq = 1;
-
-update tblscoretest set practicaltestscorereg = 'N' where subjectlistseq = 1; -- 등록일 다 N으로 변경
-
--- 1번학생 필기 실기 성적 없애기
-update tblscoreinfo set writingscore = null where scoreseq = 1;
-update tblscoreinfo set practicalscore = null where scoreseq = 1;
-
-
--- 1번학생 필기 성적 등록하기
-begin
-    procSetStdWrtScore(1, 1, 1, 30);
-end;
-
--- 1번학생 실기 성적 등록하기
-begin
-    procSetStdPrctScore(11, 1, 1, 40);
-end;
-
-select * from tblscoretest where subjectlistseq = 1;
-select * from tblscoreinfo where subjectlistseq = 1;
-
-
-
 -- 3.3. 출결점수 입력
 -- 해당 과정이 끝나야 입력이 가능하다.
 -- 해당 과목목록의 과정이 끝났는지 확인
@@ -785,13 +700,6 @@ exception
     when others then
         dbms_output.put_line('예외 처리');
 end procGetAttGrade;
-
---declare
---    vresult number;
---begin
---    procGetAttGrade(13, vresult);
---    dbms_output.put_line(vresult);
---end;
 
 
 -- 학생의 출결 점수 입력하기
@@ -875,47 +783,9 @@ begin
     -- 학생 1번, 과목목록 1번, 과정 1번, 과목 1번
 --    procSetStdAttScore(1, 1, 1, 19);
 --    procSetStdAttScore(1, 1, 1, 40);
-    procSetStdAttScore(1, 1, 1, 40);
+    procSetStdAttScore(1, 1, 1, 40); -- 배점 없음
 end;
 
-
--- 확인
---select * from tblsubjectgrade where subjectlistseq = 10;
---
---select * from tblcourse where courseseq = 3;
---select * from tblscoreinfo where studentseq = 66 and subjectlistseq = 13;
---
------
---select * from tblcourse where courseseq = 10;
---
---select * from tblsubjectlist where courseseq = 10; -- 37~42
---select * from tblsubjectgrade where subjectlistseq = 37;
---select * from tblscoreinfo where subjectlistseq = 37;
---------------------------------------------------------------------------------------------------------------------
-
-select * from tblscoreinfo; -- subjectlistseq
-
-select* from tblscoreinfo where subjectlistseq = 3;
-
-select * from tblstudent where studentseq = 33;
-
-
--- 과정번호 찾기
-    select courseseq from tblsubjectlist where subjectlistseq = 6;
-
-select * from tblcourse where courseseq = 1;
-
-select * from tblscoretest;
-
-select * from tblscoreinfo where subjectlistseq = 1;
-
-update tblscoreinfo set writingscore = null where studentseq = 1;
-
---update tblscoretest set writtentestscorereg = 'N' where subjectlistseq = 1;
-
-update tblscoreinfo set writingscore = 20 where studentseq = 1;
-
---update tblscoretest set writtentestscorereg = 'N' where scoretestseq = 6;
 
 
 -- 트리거

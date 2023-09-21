@@ -27,53 +27,6 @@ from tblSchedule sch
 order by sl.subjectstartdate asc;
 
 
-
-
---select * from vwTeacherSchedule;
-
-
---create or replace procedure procGetTeacherSchedule(
---    pteacherseq in number,
---    pcursor out SYS_REFCURSOR
---)
---is
---begin
---    open pcursor
---    for
---    select 
---        sl.subseq as 과목번호, 
---        sl.courseseq as 과정번호, 
---        c.coursename as 과정명, 
---        c.coursestartdate as 과정시작일, 
---        c.coursefinishdate as 과정종료일, 
---        c.classroomname as 강의실, 
---        s.subname as 과목명, 
---        sl.subjectstartdate as 과목시작일, 
---        sl.subjectfinishdate as 과목종료일,
---        b.bookname as 교재명, 
---        c.studentnumber as 교육생등록인원,
---        case
---            when sl.subjectstartdate > sysdate and sl.subjectfinishdate > sysdate then '강의예정'
---            when sl.subjectstartdate < sysdate and sl.subjectfinishdate > sysdate then '강의중'
---            when sl.subjectfinishdate < sysdate then '강의종료'
---        end as 강의진행여부
---    from tblSchedule sch
---        inner join tblSubjectList sl on sch.subjectlistseq = sl.subjectlistseq
---        inner join tblCourse c on sl.courseseq = c.courseseq
---        inner join tblBook b on sl.bookseq = b.bookseq
---        inner join tblSubject s on sl.subseq = s.subseq
---    where sch.teacherseq = pteacherseq
---    order by sl.subjectstartdate asc;
---exception
---    when NO_DATA_FOUND then
---        dbms_output.put_line('해당 교사의 스케줄이 없습니다.');  
---        
---    when others then
---    dbms_output.put_line('예외 처리');
---end procGetTeacherSchedule;
-
-
--- 뷰 적용 버전
 -- 교사 번호에 해당하는 교사 테이블 가져오기
 create or replace procedure procGetTeacherSchedule(
     pteacherseq in number,
@@ -94,8 +47,6 @@ exception
     when others then
     dbms_output.put_line('예외 처리');
 end procGetTeacherSchedule;
-
-
 
 
 
@@ -140,7 +91,7 @@ begin
     procGetTeacherName(pteacherseq, vteachername);
     dbms_output.put_line('교사번호: ' || pteacherseq || '  교사명:  ' || vteachername); 
     
-    dbms_output.put_line('----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------');
+    dbms_output.put_line('------------------------------------------------------------------------------------------------------------------------------');
     
     -- 해당 교사 스케줄 가져오기
     procGetTeacherSchedule(pteacherseq, vcursor);
@@ -150,9 +101,13 @@ begin
         fetch vcursor into vsubseq, vcourseseq, vcoursename, vcoursestartdate, vcoursefinishdate, vclassroomname, vsubname, vsubjectstartdate, 
             vsubjectfinishdate, vbookname, vstudentnumber, vprogress;
             exit when vcursor%notfound;
-                dbms_output.put_line('과목번호: ' || vsubseq || '   과정번호: ' || vcourseseq || '   과정명: ' || vcoursename ||'   과정시작일: ' || 
-                vcoursestartdate || '   과정종료일: ' || vcoursefinishdate || '   강의실: ' || vclassroomname || '   과목명: ' || vsubname || 
-                '   과목시작일: ' || vsubjectstartdate || '   과목종료일: ' || vsubjectfinishdate || '   교재명: ' || vbookname || '   교육생등록인원: ' 
+                dbms_output.put_line('------------------------------------------------------------------------------------------------------------------------------');
+                dbms_output.put_line('과정번호: ' || vcourseseq || '   과정명: ' || vcoursename);
+                dbms_output.put_line('과정시작일: ' || 
+                vcoursestartdate || '   과정종료일: ' || vcoursefinishdate || '   강의실: ' || vclassroomname);
+                dbms_output.put_line('과목번호: ' || vsubseq || '   과목명: ' || vsubname || 
+                '   과목시작일: ' || vsubjectstartdate || '   과목종료일: ' || vsubjectfinishdate);
+                dbms_output.put_line('교재명: ' || vbookname || '   교육생등록인원: ' 
                 || vstudentnumber || '   강의진행여부: ' || vprogress);
     end loop;
 exception
@@ -335,7 +290,7 @@ begin
     procGetTeacherName(pteacherseq, vteachername);
     dbms_output.put_line('교사번호: ' || pteacherseq || '  교사명:  ' || vteachername); 
     
-    dbms_output.put_line('----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------');
+    dbms_output.put_line('-----------------------------------------------------------------------------------------------------------------------------------------');
     
     -- 해당 교사 스케줄 가져오기
     procGetTFinishedSubject(pteacherseq, vcursor);
@@ -371,7 +326,12 @@ begin
                 vpracticaltestdatechar := 'null';
             end if;
             
-            dbms_output.put_line('과목번호: ' || vsubseq || '   과정번호: ' || vcourseseq || '   과정명: ' || vcoursename ||'   과정시작일: ' || vcoursestartdate || '   과정종료일: ' || vcoursefinishdate || '   강의실: ' || vclassroomname || '   과목명: ' || vsubname || '   과목시작일: ' || vsubjectstartdate || '   과목종료일: ' || vsubjectfinishdate || '   교재명: ' || vbookname || '   출결배점: ' || vattgradechar || '   필기배점: ' || vwgradechar || '   실기배점: ' || vpgradechar || '   필기시험날짜: ' || vwrittentestdatechar || '   실기시험날짜: ' || vpracticaltestdatechar || '   필기시험문제등록여부: ' || vwrittenfilereg || '   실기시험문제등록여부: ' || vpracticalfilereg);
+            dbms_output.put_line('-----------------------------------------------------------------------------------------------------------------------------------------');
+            dbms_output.put_line('과정번호: ' || vcourseseq || '   과정명: ' || vcoursename ||'   과정시작일: ' || vcoursestartdate || '   과정종료일: ' || vcoursefinishdate || '   강의실: ' || vclassroomname);
+            dbms_output.put_line('과목번호: ' || vsubseq || '   과목명: ' || vsubname || '   과목시작일: ' || vsubjectstartdate || '   과목종료일: ' || vsubjectfinishdate || '   교재명: ' || vbookname);
+            dbms_output.put_line('출결배점: ' || vattgradechar || '   필기배점: ' || vwgradechar || '   실기배점: ' || vpgradechar);
+            dbms_output.put_line('필기시험날짜: ' || vwrittentestdatechar || '   실기시험날짜: ' || vpracticaltestdatechar || '   필기시험문제등록여부: ' || vwrittenfilereg || '   실기시험문제등록여부: ' || vpracticalfilereg);
+            
     end loop;
 exception
     when NO_DATA_FOUND then
@@ -379,7 +339,7 @@ exception
         
     when others then
         dbms_output.put_line('예외 처리');
-end;
+end procPrintTFinishedSubject;
 
 -- 최종 실행
 begin 
@@ -387,8 +347,6 @@ begin
 end;
 
 
---select * from tblsubjectgrade;
---select * from tblsubjectlist;
 
 -- 2.2.1 특정 과목 선택시 해당 과목의 출결/필기/실기 배점 입력하기
 
@@ -409,13 +367,6 @@ exception
         dbms_output.put_line('예외 처리');
 end procGetSubjectListNum;
 
--- 테스트
---declare
---    vresult number;
---begin
---    procGetSubjectListNum(1, 3, vresult);
---    dbms_output.put_line(vresult);
---end;
 
 
 -- 해당 과목의 배점이 입력되었는가 확인
@@ -433,15 +384,6 @@ exception
     when others then
         dbms_output.put_line('예외 처리');
 end procCheckSubjectGrade;
-
-
--- 테스트
---declare
---    vresult tblsubjectgrade.attendancegrade%type;
---begin
---    procCheckSubjectGrade(13, vresult);
---    dbms_output.put_line(vresult);
---end;
 
 
 -- 과목번호, 과정번호 입력
@@ -512,28 +454,7 @@ begin
     procSetSubjectGrade(9, 2, 20, 50, 50); -- 총 점수를 100 이상
 end;
 
--- 값 테스트
-select * from tblsubjectgrade where subjectgradeseq = 13;
-
-update tblsubjectgrade set attendancegrade = null where subjectgradeseq = 13;
-update tblsubjectgrade set writtengrade = null where subjectgradeseq = 13;
-update tblsubjectgrade set practicalgrade = null where subjectgradeseq = 13;
-
--- 원본
-
-update tblsubjectgrade set attendancegrade = 20 where subjectgradeseq = 13;
-update tblsubjectgrade set writtengrade = 50 where subjectgradeseq = 13;
-update tblsubjectgrade set practicalgrade = 30 where subjectgradeseq = 13;
-
------
-select * from tblsubjectgrade where subjectgradeseq = 18;
-
-update tblsubjectgrade set attendancegrade = null where subjectgradeseq = 18;
-update tblsubjectgrade set writtengrade = null where subjectgradeseq = 18;
-update tblsubjectgrade set practicalgrade = null where subjectgradeseq = 18;
-
 --------------------------------------------------------------------------------------------------------------
---select * from tblscoretest;
 
 -- 2.2.2. 필기 시험 날짜 등록
 -- 1. 해당 필기 시험 날짜 가져오기
@@ -552,15 +473,7 @@ exception
         dbms_output.put_line('예외 처리');
 end procCheckWrittenDateReg;
 
---declare
---    vresult date;
---begin
---    procCheckWrittenDateReg(13, vresult);
---    dbms_output.put_line(vresult);
---end;
 
-
---set serverout on;
 
 -- 2. 필기 시험 날짜 등록
 create or replace procedure procSetWrtTestDate(
@@ -607,8 +520,6 @@ begin
     procSetWrtTestDate(34, 1, '23/05/15');
 end;
 
--- 확인
---select * from tblscoretest where subjectlistseq = 13;
 
 -- 2.2.3. 필기 문제 등록
 -- 1. 등록 여부 확인을 위해 값 가져오기
@@ -627,12 +538,6 @@ exception
         dbms_output.put_line('예외 처리');
 end procCheckWrittenFileReg;
 
---declare
---    vresult tblScoreTest.writtentestfilereg%type;
---begin
---    procCheckWrittenFileReg(13, vresult);
---    dbms_output.put_line(vresult);
---end;
 
 -- 2. 값이 'N'이면 'Y'로 변경
 create or replace procedure procSetWrtTestReg(
@@ -676,8 +581,6 @@ begin
     procSetWrtTestReg(34, 1);
 end;
 
--- 확인
---select * from tblscoretest where subjectlistseq = 13;
 
 -- 2.2.4. 실기 시험 날짜 등록
 -- 1. 해당 실기 시험 날짜 가져오기
@@ -696,12 +599,6 @@ exception
         dbms_output.put_line('예외 처리');
 end procCheckPrctDateReg;
 
---declare
---    vresult date;
---begin
---    procCheckPrctDateReg(13, vresult);
---    dbms_output.put_line(vresult);
---end;
 
 -- 2. null이면 실기 시험 날짜 등록
 create or replace procedure procSetPrctTestDate(
@@ -748,10 +645,6 @@ begin
     procSetPrctTestDate(34, 1, '23/05/29');
 end;
 
--- 확인
---select * from tblscoretest where subjectlistseq = 13;
-
-
 
 -- 2.2.5. 실기 문제 등록
 -- 1. 등록 여부 확인을 위해 값 가져오기
@@ -767,12 +660,6 @@ exception
         dbms_output.put_line('예외처리');
 end procCheckPrctFileReg;
 
---declare
---    vresult tblScoreTest.practicaltestfilereg%type;
---begin
---    procCheckPrctFileReg(13, vresult);
---    dbms_output.put_line(vresult);
---end;
 
 -- 2. 값이 'N'이면 'Y'로 변경
 create or replace procedure procSetPrctTestReg(
@@ -817,12 +704,8 @@ begin
     procSetPrctTestReg(34, 1);
 end;
 
--- 확인
---select * from tblscoretest where subjectlistseq = 13;
 
 ----------------------------------------------------------------------------------------------------------------------
-select * from tblsubjectgrade;
-select * from tblsubjectlist;
 
 -- 트리거
 -- 배점 입력 전, 과목종료일과 현재날짜를 비교해서 종료되지 않은 과목은 오류 발생
@@ -845,5 +728,3 @@ begin
     end if;
     
 end trgDateCompGrade; 
-
-drop trigger trgDateCompGrade;
