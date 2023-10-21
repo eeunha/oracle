@@ -6,8 +6,8 @@
 	
 	round()
 	- 반올림 함수
-	- number rount(컬럼명): 정수 반환
-	- number rount(컬럼명, 소수 이하 자릿수): 실수 반환
+	- number round(컬럼명): 정수 반환
+	- number round(컬럼명, 소수 이하 자릿수): 실수 반환
 	
 	
 
